@@ -48,13 +48,13 @@ class CommentController extends Controller
             'content' => request('content'),
             'comment_date' => request('comment_date'),
             'user_id' => Auth::user()->id,
-            'article_id' => 1,
+            'article_id' => request('article_id'),
         ]);
        
-        // return $comment;
+        
 
         return response()->json([
-            'comment' => $comment,
+          
             'message' => 'Article ajouté avec succés'
         ], 200);
     }
@@ -101,6 +101,12 @@ class CommentController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $comment = Comment::findOrFail($id);
+        $comment->delete();
+        return response()->json([
+          
+            'message' => 'Commentaire supprimé avec succés'
+        ], 200);
     }
+
 }

@@ -34,7 +34,7 @@
   <a href="" class="btn btn-success btn-rounded mb-4" data-toggle="modal" data-target="#addArticleModal" >Ajouter Article</a>
 </div> 
       
-    <div class="SC">
+    <div class="SC" v-if="articles">
       <div class="Post" style="padding-bottom: 40px;" v-for="article in articles" :key="article.id">
         <div class="PostHead">
           <div class="PostTime"> <strong >{{article.article_date}}</strong> </div> 
@@ -51,15 +51,19 @@
           <span>{{article.comments.length}} Comments</span>
           <div v-if="article.comments.length">
           <div class="comment" v-for="comment in article.comments" :key="comment.id" >
-            <small>Ecrit par:</small><strong>{{comment.user_id}}</strong>
-            <small class="float-right"> {{comment.comment_date}}</small>
+            <small>Ecrit par:</small><strong>{{comment.user.name}}</strong>
+            <div class="float-right" style="display:inline;">
+            <small > {{comment.comment_date}}</small>
+            <span v-if="comment.user_id == user">
+            <img src="images/trush.png" alt="trush" @click="deleteComment(comment.id)" style="cursor:pointer;">
+            </span>
+            </div>
             <p>{{comment.content}}</p>
           </div>
           </div>
          <form @submit.prevent="addComment(article.id)">
             <div class="col-sm-10">
             <input class="form-control form-control-sm" type="text"  v-model="new_comment.content" placeholder="votre commentaire ici ..." style="background:#d8fbef4a;">
-            <button>add</button>
             </div>
          </form>
         </div>
@@ -108,7 +112,7 @@ let id=0;
 
         methods: {
             closeModal() {
-                $(".modal").removeClass("is-active");
+                $(".modal").modal('toggle');
             },
             currentDateTime() {
               const now = new Date();
@@ -127,20 +131,20 @@ let id=0;
                 })
                 .then(response => {
                     this.reset();
-                    this.articles.push(response.data.article);
-
+                    //this.articles.push(response.data.article);
+                     this.readArticles();
                     this.closeModal();
                 })
-                // .catch(error => {
-                //     this.errors = [];
-                //     if (error.response.data.errors.title) {
-                //         this.errors.push(error.response.data.errors.title[0]);
-                //     }
+                 .catch(error => {
+                     this.errors = [];
+                     if (error.response.data.errors.title) {
+                         this.errors.push(error.response.data.errors.title[0]);
+                     }
 
-                //     if (error.response.data.errors.body) {
-                //         this.errors.push(error.response.data.errors.body[0]);
-                //     }
-                // });
+                     if (error.response.data.errors.body) {
+                         this.errors.push(error.response.data.errors.body[0]);
+                     }
+                 });
             },
             addComment(art_id) {
               
@@ -152,23 +156,20 @@ let id=0;
                 })
                 .then(response => {
                     this.reset();
-                    this.comments.push({
-                      id:id,
-                      value:response.data.new_comment});
+                    this.comments.push(response.data.new_comment);
 
-                  
+                   this.readArticles();
+                })
+                 .catch(error => {
+                    this.errors = [];
+                     if (error.response.data.errors.title) {
+                        this.errors.push(error.response.data.errors.title[0]);
+                     }
+
+                     if (error.response.data.errors.body) {
+                        this.errors.push(error.response.data.errors.body[0]);
+                    }
                 });
-                id++;
-                // .catch(error => {
-                //     this.errors = [];
-                //     if (error.response.data.errors.title) {
-                //         this.errors.push(error.response.data.errors.title[0]);
-                //     }
-
-                //     if (error.response.data.errors.body) {
-                //         this.errors.push(error.response.data.errors.body[0]);
-                //     }
-                // });
             },
 
             deleteArticle(id) {
@@ -176,6 +177,15 @@ let id=0;
                     .then(response => {
                         this.articles.splice(this.delete_article_index, 1);
                         this.closeModal();
+                    })
+                    .catch(error => {
+
+                    });
+            },
+             deleteComment(id) {
+                axios.delete('/comment/' + id)
+                    .then(response => {
+                       this.readArticles();
                     })
                     .catch(error => {
 

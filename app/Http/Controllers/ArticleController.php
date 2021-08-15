@@ -53,10 +53,12 @@ class ArticleController extends Controller
             'article_date' => request('article_date'),
             'user_id' => Auth::user()->id,
         ]);
-        return $article;
+       // return $article;
+
+       //$articles = Article::with(['User','Comments.user'])->latest()->get(); 
 
         return response()->json([
-            'article' => $article,
+            
             'message' => 'Article ajouté avec succés'
         ], 200);
     }
