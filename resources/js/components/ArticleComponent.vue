@@ -38,7 +38,7 @@
       <div class="Post" style="padding-bottom: 40px;" v-for="article in articles" :key="article.id">
         <div class="PostHead">
           <div class="PostTime"> <strong >{{article.article_date}}</strong> </div> 
-          <button v-if="article.user_id == user" type="button" class="btn btn-danger btn-sm float-right" @click="deleteArticle(article.id)">Supprimer</button>
+          <button v-if="article.user_id == user" type="button" class="btn btn-danger btn-sm float-right" @click.prevent="deleteArticle(article.id)">Supprimer</button>
 
           <h2><a href="#">{{article.title}} </a></h2>
           <small class="PostAuthor">Auteur : </small> <small class="PostCat"> <a href="#">{{article.user.name}}</a></small> </div>
@@ -55,7 +55,7 @@
             <div class="float-right" style="display:inline;">
             <small > {{comment.comment_date}}</small>
             <span v-if="comment.user_id == user">
-            <img src="images/trush.png" alt="trush" @click="deleteComment(comment.id)" style="cursor:pointer;">
+            <img src="images/trush.png" alt="trush" @click.prevent="deleteComment(comment.id)" style="cursor:pointer;">
             </span>
             </div>
             <p>{{comment.content}}</p>

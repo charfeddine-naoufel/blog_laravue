@@ -5,7 +5,7 @@
     <div class="row justify-content-center">
         <div class="col-md-10">
             <div class="card">
-                <div class="card-header">{{ __('Dashboard') }}</div>
+                <div class="card-header">{{ __('Mini-Blog Laravel/vuejs') }}  <small class="float-right">Developed by: Charfeddine Naoufel</small> </div>
 
                 <div class="card-body">
                     @if (session('status'))

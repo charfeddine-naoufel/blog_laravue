@@ -37778,6 +37778,7 @@ var render = function() {
                             attrs: { type: "button" },
                             on: {
                               click: function($event) {
+                                $event.preventDefault()
                                 return _vm.deleteArticle(article.id)
                               }
                             }
@@ -37848,6 +37849,7 @@ var render = function() {
                                             },
                                             on: {
                                               click: function($event) {
+                                                $event.preventDefault()
                                                 return _vm.deleteComment(
                                                   comment.id
                                                 )
