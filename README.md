@@ -4,11 +4,11 @@ A simple mini blog for demonstration purpose. Based on Laravel 8.
 # Installation
 Clone the repository-
 ```sh
-clone https://github.com/YoussefHarizi/blog-app.git blog-app
+clone https://github.com/charfeddine-naoufel/blog_laravue.git
 ```
 Then cd into the folder with this command-
 ```sh
-cd blog-app
+cd blog-laravue
 ```
 Then if you use docker run :
 ```sh
