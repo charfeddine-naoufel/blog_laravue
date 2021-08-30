@@ -173,23 +173,88 @@ let id=0;
             },
 
             deleteArticle(id) {
+            Swal.fire({
+            title: 'Etes vous sur ?',
+            text: "Cette action est irréversible!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Oui, Supprimer!'
+          }).then((result) => {
+              
+            if (result.value) {
+              //Send Request to server
                 axios.delete('/article/' + id)
                     .then(response => {
                         this.articles.splice(this.delete_article_index, 1);
-                        this.closeModal();
+                         Swal.fire(
+                            'Supprimé!',
+                            'Article supprimé avec succeés',
+                            'success'
+                          )
+                        
                     })
                     .catch(error => {
+                        console.log(response);
+                        Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Erreur de suppression!'
+                        
+                      })
 
                     });
+
+              //************** */
+            
+              }
+  
+          })
+        
+
+                
             },
              deleteComment(id) {
+                  Swal.fire({
+            title: 'Etes vous sur ?',
+            text: "Cette action est irréversible!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Oui, Supprimer!'
+          }).then((result) => {
+              
+            if (result.value) {
+              //Send Request to server
                 axios.delete('/comment/' + id)
                     .then(response => {
                        this.readArticles();
+                         Swal.fire(
+                            'Supprimé!',
+                            'Commentaire supprimé avec succeés',
+                            'success'
+                          )
+                        
                     })
                     .catch(error => {
+                        console.log(response);
+                        Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Erreur de suppression!'
+                        
+                      })
 
                     });
+
+              //************** */
+            
+              }
+  
+          })
+                 
             },
 
             initAddArticle() {

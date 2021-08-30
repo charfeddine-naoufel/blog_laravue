@@ -23,5 +23,9 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-Route::resource('article',ArticleController::class);
-Route::resource('comment',CommentController::class);
+
+Route::group(['middleware' => 'auth'], function () {
+    // User needs to be authenticated to enter here.
+    Route::resource('article',ArticleController::class);
+    Route::resource('comment',CommentController::class);
+});
