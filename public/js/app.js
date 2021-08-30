@@ -1926,6 +1926,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 var id = 0;
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
@@ -1944,13 +1946,29 @@ var id = 0;
       },
       articles: [],
       comments: [],
-      update_article: {}
+      update_article: {},
+      error: []
     };
   },
   mounted: function mounted() {
     this.readArticles();
   },
+  computed: {
+    titleIsValid: function titleIsValid() {
+      return this.article.title;
+    },
+    contentIsValid: function contentIsValid() {
+      return this.article.body;
+    },
+    formIsValid: function formIsValid() {
+      return this.titleIsValid && this.contentIsValid;
+    },
+    commentIsValid: function commentIsValid() {
+      return this.new_comment.content;
+    }
+  },
   methods: {
+    //close modal
     closeModal: function closeModal() {
       $(".modal").modal('toggle');
     },
@@ -1990,28 +2008,30 @@ var id = 0;
     addComment: function addComment(art_id) {
       var _this2 = this;
 
-      axios.post('/comment', {
-        content: this.new_comment.content,
-        comment_date: this.currentDateTime(),
-        user_id: document.querySelector("meta[name='user-id']").getAttribute('content'),
-        article_id: art_id
-      }).then(function (response) {
-        _this2.reset();
+      if (this.commentIsValid) {
+        axios.post('/comment', {
+          content: this.new_comment.content,
+          comment_date: this.currentDateTime(),
+          user_id: document.querySelector("meta[name='user-id']").getAttribute('content'),
+          article_id: art_id
+        }).then(function (response) {
+          _this2.reset();
 
-        _this2.comments.push(response.data.new_comment);
+          _this2.comments.push(response.data.new_comment);
 
-        _this2.readArticles();
-      })["catch"](function (error) {
-        _this2.errors = [];
+          _this2.readArticles();
+        })["catch"](function (error) {
+          _this2.errors = [];
 
-        if (error.response.data.errors.title) {
-          _this2.errors.push(error.response.data.errors.title[0]);
-        }
+          if (error.response.data.errors.title) {
+            _this2.errors.push(error.response.data.errors.title[0]);
+          }
 
-        if (error.response.data.errors.body) {
-          _this2.errors.push(error.response.data.errors.body[0]);
-        }
-      });
+          if (error.response.data.errors.body) {
+            _this2.errors.push(error.response.data.errors.body[0]);
+          }
+        });
+      }
     },
     deleteArticle: function deleteArticle(id) {
       var _this3 = this;
@@ -2074,11 +2094,6 @@ var id = 0;
     initAddArticle: function initAddArticle() {
       $("#addArticleModal").addClass("is-active");
     },
-    initUpdate: function initUpdate(index) {
-      this.errors = [];
-      $("#updateArticleModal").addClass("is-active");
-      this.update_article = this.articles[index];
-    },
     readArticles: function readArticles() {
       var _this5 = this;
 
@@ -2090,28 +2105,6 @@ var id = 0;
       this.article.title = '';
       this.article.body = '';
       this.new_comment.content = '';
-    },
-    updateArticle: function updateArticle() {
-      var _this6 = this;
-
-      axios.patch('/article/' + this.update_article.id, {
-        title: this.update_article.title,
-        body: this.update_article.body,
-        article_date: this.currentDateTime(),
-        user_id: document.querySelector("meta[name='user-id']").getAttribute('content')
-      }).then(function (response) {
-        _this6.closeModal();
-      })["catch"](function (error) {
-        _this6.errors = [];
-
-        if (error.response.data.errors.title) {
-          _this6.errors.push(error.response.data.errors.title[0]);
-        }
-
-        if (error.response.data.errors.body) {
-          _this6.errors.push(error.response.data.errors.body[0]);
-        }
-      });
     }
   }
 });
@@ -40880,7 +40873,13 @@ var render = function() {
                         _vm.$set(_vm.article, "title", $event.target.value)
                       }
                     }
-                  })
+                  }),
+                  _vm._v(" "),
+                  !_vm.titleIsValid
+                    ? _c("p", { staticClass: "text-danger" }, [
+                        _vm._v(" le champ titre est obligatoire!")
+                      ])
+                    : _vm._e()
                 ]),
                 _vm._v(" "),
                 _c("div", { staticClass: "md-form mb-4" }, [
@@ -40903,7 +40902,8 @@ var render = function() {
                     attrs: {
                       id: "exampleFormControlTextarea1",
                       rows: "3",
-                      name: "body"
+                      name: "body",
+                      required: ""
                     },
                     domProps: { value: _vm.article.body },
                     on: {
@@ -40914,7 +40914,13 @@ var render = function() {
                         _vm.$set(_vm.article, "body", $event.target.value)
                       }
                     }
-                  })
+                  }),
+                  _vm._v(" "),
+                  !_vm.contentIsValid
+                    ? _c("p", { staticClass: "text-danger" }, [
+                        _vm._v(" le champ contenu est obligatoire!")
+                      ])
+                    : _vm._e()
                 ])
               ]),
               _vm._v(" "),
@@ -40926,6 +40932,7 @@ var render = function() {
                     "button",
                     {
                       staticClass: "btn btn-primary",
+                      attrs: { disabled: !_vm.formIsValid },
                       on: { click: _vm.createArticle }
                     },
                     [

@@ -15,16 +15,18 @@
         <div class="md-form mb-5">
           <label data-error="wrong" data-success="right" for="form3">Titre:</label>
           <input type="text" id="form3" class="form-control validate" name="title" v-model="article.title" required>
+          <p v-if='!titleIsValid'  class="text-danger"> le champ titre est obligatoire!</p>
         </div>
 
         <div class="md-form mb-4">
           <label for="exampleFormControlTextarea1">Article:</label>
-    <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" name="body" v-model="article.body"></textarea>
+    <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" name="body" v-model="article.body"required></textarea>
+    <p v-if='!contentIsValid'  class="text-danger"> le champ contenu est obligatoire!</p>
         </div>
 
       </div>
       <div class="modal-footer d-flex justify-content-center">
-        <button class="btn btn-primary" @click="createArticle">Enregistrer <i class="fas fa-paper-plane-o ml-1"></i></button>
+        <button class="btn btn-primary" :disabled="! formIsValid" @click="createArticle">Enregistrer <i class="fas fa-paper-plane-o ml-1"></i></button>
       </div>
     </div>
   </div>
@@ -102,6 +104,7 @@ let id=0;
                 articles: [],
                 comments: [],
                 update_article: {},
+                error:[],
                 
             }
         },
@@ -109,11 +112,28 @@ let id=0;
         mounted() {
             this.readArticles();
         },
+        computed:{
+            titleIsValid(){
+                return this.article.title
+            },
+          
+            contentIsValid(){
+                return this.article.body
+            },
+             formIsValid(){
+                return this.titleIsValid && this.contentIsValid
+            },
+             commentIsValid(){
+                return this.new_comment.content
+            }
+        },
 
         methods: {
+            //close modal
             closeModal() {
                 $(".modal").modal('toggle');
             },
+   
             currentDateTime() {
               const now = new Date();
               const date = now.getFullYear()+'-'+(now.getMonth()+1)+'-'+now.getDate();
@@ -123,30 +143,34 @@ let id=0;
             },
 
             createArticle() {
-                axios.post('/article', {
-                    title: this.article.title,
-                    body: this.article.body,
-                    article_date:this.currentDateTime(),
-                    user_id: document.querySelector("meta[name='user-id']").getAttribute('content'),
-                })
-                .then(response => {
-                    this.reset();
-                    //this.articles.push(response.data.article);
-                     this.readArticles();
-                    this.closeModal();
-                })
-                 .catch(error => {
-                     this.errors = [];
-                     if (error.response.data.errors.title) {
-                         this.errors.push(error.response.data.errors.title[0]);
-                     }
-
-                     if (error.response.data.errors.body) {
-                         this.errors.push(error.response.data.errors.body[0]);
-                     }
-                 });
+               
+                    axios.post('/article', {
+                        title: this.article.title,
+                        body: this.article.body,
+                        article_date:this.currentDateTime(),
+                        user_id: document.querySelector("meta[name='user-id']").getAttribute('content'),
+                    })
+                    .then(response => {
+                        this.reset();
+                        //this.articles.push(response.data.article);
+                         this.readArticles();
+                        this.closeModal();
+                    })
+                     .catch(error => {
+                         this.errors = [];
+                         if (error.response.data.errors.title) {
+                             this.errors.push(error.response.data.errors.title[0]);
+                         }
+    
+                         if (error.response.data.errors.body) {
+                             this.errors.push(error.response.data.errors.body[0]);
+                         }
+                     });
+                
             },
             addComment(art_id) {
+              if(this.commentIsValid){
+
               
                 axios.post('/comment', {
                     content: this.new_comment.content,
@@ -170,6 +194,7 @@ let id=0;
                         this.errors.push(error.response.data.errors.body[0]);
                     }
                 });
+            }
             },
 
             deleteArticle(id) {
@@ -261,11 +286,7 @@ let id=0;
                 $("#addArticleModal").addClass("is-active");
             },
 
-            initUpdate(index) {
-                this.errors = [];
-                $("#updateArticleModal").addClass("is-active");
-                this.update_article = this.articles[index];
-            },
+           
 
             readArticles() {
                 axios.get('/article')
@@ -281,27 +302,6 @@ let id=0;
                 
             },
 
-            updateArticle() {
-                axios.patch('/article/' + this.update_article.id, {
-                    title: this.update_article.title,
-                    body: this.update_article.body,
-                    article_date:this.currentDateTime(),
-                    user_id: document.querySelector("meta[name='user-id']").getAttribute('content'),
-                })
-                .then(response => {
-                    this.closeModal();
-                })
-                .catch(error => {
-                    this.errors = [];
-                    if (error.response.data.errors.title) {
-                        this.errors.push(error.response.data.errors.title[0]);
-                    }
-
-                    if (error.response.data.errors.body) {
-                        this.errors.push(error.response.data.errors.body[0]);
-                    }
-                });
-            },
         }
     }
 </script>
